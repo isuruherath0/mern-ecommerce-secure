@@ -173,7 +173,7 @@ exports.addProduct = async (req, res) => {
 exports.updateProduct = async (req, res) => {
     try {
         const user = req.body.user;
-        if (user.admin !== true) {
+        if (user.isAdmin !== true) {
             return res.status(401).json({
                 status: 'failed',
                 error: 'You are not authorized to update a product'
@@ -195,7 +195,7 @@ exports.updateProduct = async (req, res) => {
 exports.deleteProduct = async (req, res) => {
     try {
         const user = req.body.user;
-        if (user.admin !== true) {
+        if (user.isAdmin !== true) {
             return res.status(401).json({
                 status: 'failed',
                 error: 'You are not authorized to delete a product'

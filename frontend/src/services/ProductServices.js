@@ -73,19 +73,25 @@ export const addProduct = async (imageUrl, name, color, sizes, description, cate
     return data;
 };
 
-export const updateProduct = async (id, name, description, price) => {
-    const { data } = await axios.put(`${process.env.REACT_APP_API_BASE_URL}/products/${id}`, {
-        name,
-        description,
-        price
-    });
-    return data;
+export const updateProduct = async (id, name, description, price, userId, isAdmin) => {
+    const user = { userId, isAdmin }
+    try {
+        const { data } = await axios.put(`${process.env.REACT_APP_API_BASE_URL}/products/${id}`, {
+            name,
+            description,
+            price,
+            user: user
+        });
+
+        return data;
+    } catch (error) {
+        throw new Error(error.response?.data?.error || 'Failed to update the product');
+    }
 };
 
 
-
-export const deleteProduct = async (id, userId, admin) => {
-    const user = { userId, admin };
+export const deleteProduct = async (id, userId, isAdmin) => {
+    const user = { userId, isAdmin };
     try {
         const { data } = await axios.delete(`${process.env.REACT_APP_API_BASE_URL}/products/${id}`, {
             data: { user }
