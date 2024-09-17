@@ -32,13 +32,13 @@ exports.getProductById = async (req, res) => {
 
 exports.getProductsByColor = async (req, res) => {
     try {
-        const products = await Product.find({ 
+        const products = await Product.find({
             $and: [
                 { price: { $gte: req.body.lowest } },
                 { price: { $lte: req.body.uppest } },
                 { color: req.params.color }
             ]
-         });
+        });
 
         res.status(200).json({
             products
@@ -172,8 +172,7 @@ exports.addProduct = async (req, res) => {
 
 exports.updateProduct = async (req, res) => {
     try {
-        const user = req.user;
-        console.log(user.admin);
+        const user = req.body.user;
         if (user.admin !== true) {
             return res.status(401).json({
                 status: 'failed',
@@ -195,8 +194,7 @@ exports.updateProduct = async (req, res) => {
 
 exports.deleteProduct = async (req, res) => {
     try {
-        const user = req.user;
-        console.log(user.admin);
+        const user = req.body.user;
         if (user.admin !== true) {
             return res.status(401).json({
                 status: 'failed',

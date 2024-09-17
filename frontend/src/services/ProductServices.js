@@ -59,7 +59,7 @@ export const getProductsByQueries = async (lowest, uppest, gender, color) => {
     return data;
 };
 
-export const addProduct = async (imageUrl,name, color, sizes, description, category, gender, price) => {
+export const addProduct = async (imageUrl, name, color, sizes, description, category, gender, price) => {
     const { data } = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/products`, {
         imageUrl,
         name,
@@ -82,7 +82,17 @@ export const updateProduct = async (id, name, description, price) => {
     return data;
 };
 
-export const deleteProduct = async (id) => {
-    const { data } = await axios.delete(`${process.env.REACT_APP_API_BASE_URL}/products/${id}`);
-    return data;
+
+
+export const deleteProduct = async (id, userId, admin) => {
+    const user = { userId, admin };
+    try {
+        const { data } = await axios.delete(`${process.env.REACT_APP_API_BASE_URL}/products/${id}`, {
+            data: { user }
+        });
+
+        return data;
+    } catch (error) {
+        throw new Error(error.response?.data?.error || 'Failed to delete the product');
+    }
 };
