@@ -35,7 +35,14 @@ app.use(
 );
 
 
-app.use(cors());
+const corsOptions = {
+    origin: ['http://localhost:3000'], //accepting requests from trusted origin
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
+};
+app.use(cors(corsOptions));
+
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(express.json());
 
