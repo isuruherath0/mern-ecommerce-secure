@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv').config();
 const stripe = require("stripe")(process.env.STRIPE_API_KEY);
+const helmet = require('helmet');
 
 const categoryRoutes = require('./routes/categoryRoutes');
 const productRoutes = require('./routes/productRoutes');
@@ -19,6 +20,21 @@ const app = express();
 const port = process.env.PORT || 4000;
 
 // MIDDLEWARES
+
+app.use(helmet());  // Adding Helmet for security headers
+app.use(
+    helmet.contentSecurityPolicy({
+        directives: {
+            defaultSrc: ["'self'"],
+            scriptSrc: ["'self'", "trusteddomain.com"], // Example of trusted domain for scripts
+            objectSrc: ["'none'"], // Disallow object embeds
+            imgSrc: ["'self'", "data:"], // Allow images from the same origin and data URIs
+            upgradeInsecureRequests: [],
+        },
+    })
+);
+
+
 app.use(cors());
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(express.json());
