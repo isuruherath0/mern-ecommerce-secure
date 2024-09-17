@@ -172,6 +172,14 @@ exports.addProduct = async (req, res) => {
 
 exports.updateProduct = async (req, res) => {
     try {
+        const user = req.user;
+        console.log(user.admin);
+        if (user.admin !== true) {
+            return res.status(401).json({
+                status: 'failed',
+                error: 'You are not authorized to update a product'
+            });
+        }
         const product = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
 
         res.status(200).json({
@@ -187,6 +195,14 @@ exports.updateProduct = async (req, res) => {
 
 exports.deleteProduct = async (req, res) => {
     try {
+        const user = req.user;
+        console.log(user.admin);
+        if (user.admin !== true) {
+            return res.status(401).json({
+                status: 'failed',
+                error: 'You are not authorized to delete a product'
+            });
+        }
         const product = await Product.findByIdAndDelete(req.params.id);
 
         res.status(200).json({
