@@ -20,11 +20,16 @@ export const getOrdersByUserId = async (id) => {
     return data;
 };
 
-export const addOrder = async (products, buyer, address) => {
+// Function to create a new order with CSRF protection
+export const addOrder = async (products, buyer, address, csrfToken) => {
     const { data } = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/orders`, {
         products,
         buyer,
         address
+    }, {
+        headers: {
+            'CSRF-Token': csrfToken // Send the CSRF token in the request headers
+        }
     });
     return data;
 };

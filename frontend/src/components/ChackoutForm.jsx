@@ -3,6 +3,7 @@ import { useCookies } from 'react-cookie';
 import { PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
 
 import { addOrder, deleteOrder } from "../services/OrderServices";
+import { fetchCsrfToken } from '../services/CsrfService';  
 import { useUserContext } from "../contexts/UserContext";
 import { useCartContext } from '../contexts/CartContext';
 
@@ -10,6 +11,7 @@ const ChackoutForm = ({ address }) => {
     const stripe = useStripe();
     const elements = useElements();
     const [cookies, setCookie, removeCookie] = useCookies(['cart']);
+    const [csrfToken, setCsrfToken] = useState('');
 
     const [products, setProducts] = useState([]);
     const [message, setMessage] = useState(null);
@@ -19,8 +21,20 @@ const ChackoutForm = ({ address }) => {
     const { currentUser } = useUserContext();
     const { cart, setCart } = useCartContext();
 
+    // Fetch CSRF token from service when component mounts
     useEffect(() => {
+        const getCsrfToken = async () => {
+            try {
+                const token = await fetchCsrfToken();  // Use the CSRF service here
+                setCsrfToken(token);
+            } catch (error) {
+                console.error("Failed to fetch CSRF token", error);
+            }
+        };
+        getCsrfToken();
+    }, []);
 
+    useEffect(() => {
         if (!stripe) {
             return;
         }
@@ -52,15 +66,9 @@ const ChackoutForm = ({ address }) => {
     }, [stripe, cart]);
 
     useEffect(() => {
-
         setAllProductData(cart);
-
-        var productArray = []
-        cart.forEach((product) => {
-            productArray.push(product.id);
-        });
+        const productArray = cart.map(product => product.id);
         setProducts(productArray);
-
     }, [cart, cookies]);
 
     const handleSubmit = async (e) => {
@@ -72,13 +80,13 @@ const ChackoutForm = ({ address }) => {
 
         setIsLoading(true);
 
-        addOrder(products, currentUser, address)
+        // Add CSRF token to the order creation request
+        addOrder(products, currentUser, address, csrfToken)
             .then((result) => {
                 setOrderId(result.newOrder._id);
             });
 
         setCart([]);
-
         removeCookie('cart', { path: '/' });
 
         const baseUrl = window.location.origin;
@@ -89,16 +97,12 @@ const ChackoutForm = ({ address }) => {
             },
         });
 
-        if (error.type === "card_error" || error.type === "validation_error") {
+        if (error) {
             setMessage(error.message);
             setCart(allProductData);
             setCookie('cart', allProductData, { path: '/' });
             deleteOrder(orderId);
-        } else {
-            setMessage("An unexpected error occurred.");
-            setCart(allProductData);
-            setCookie('cart', allProductData, { path: '/' });
-            deleteOrder(orderId);
+
         }
 
         setIsLoading(false);
@@ -112,7 +116,6 @@ const ChackoutForm = ({ address }) => {
                     {isLoading ? <div className="spinner" id="spinner"></div> : "Pay now"}
                 </span>
             </button>
-
             {message && <div id="payment-message">{message}</div>}
         </form>
     );
