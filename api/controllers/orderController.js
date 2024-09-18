@@ -62,10 +62,15 @@ exports.getOrdersByStatus = async (req, res) => {
 
 exports.addOrder = async (req, res) => {
     try {
+        // Creating CSRF Token
+        const csrfToken = req.csrfToken(); 
+
         const newOrder = await Order.create(req.body);
 
         res.status(201).json({
-            newOrder
+            newOrder,
+            csrfToken,  // Send the CSRF token back to the client (optional)
+            message: 'Order created successfully'
         });
     } catch (error) {
         res.status(400).json({

@@ -4,6 +4,7 @@ const cors = require('cors');
 const dotenv = require('dotenv').config();
 const stripe = require("stripe")(process.env.STRIPE_API_KEY);
 const helmet = require('helmet');
+const cookieParser = require('cookie-parser');
 
 const categoryRoutes = require('./routes/categoryRoutes');
 const productRoutes = require('./routes/productRoutes');
@@ -45,6 +46,9 @@ app.use(cors(corsOptions));
 
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(express.json());
+
+// Use cookie-parser to parse cookies (CSRF tokens are stored in cookies)
+app.use(cookieParser());
 
 // ROUTES
 app.use('/users', userRoutes);
