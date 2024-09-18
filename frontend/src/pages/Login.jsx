@@ -16,8 +16,7 @@ import {
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useFormik } from "formik";
 import google from "../assets/google.png";
-//import { useGoogleLogin } from "@react-oauth/google";
-
+import { GoogleLogin } from "@react-oauth/google";
 import { useUserContext } from "../contexts/UserContext";
 import LoginValidations from "../validations/LoginValidations";
 import { Login as LogIn } from "../services/AuthServices";
@@ -68,66 +67,6 @@ const Login = () => {
     },
     validationSchema: LoginValidations,
   });
-
-  // Google Login handler
-  // const googleLogin = useGoogleLogin({
-  //   onSuccess: async (tokenResponse) => {
-  //     try {
-  //       // Send token to backend for verification
-  //       const result = await fetch("http://localhost:5000/auth/google", {
-  //         method: "POST",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //         body: JSON.stringify({ token: tokenResponse.access_token }),
-  //       });
-  //       const data = await result.json();
-  //       if (data.currentUser) {
-  //         setCurrentUser(data.currentUser._id);
-  //         toast({
-  //           title: "Logged in with Google.",
-  //           description: "You have successfully logged in.",
-  //           status: "success",
-  //           duration: 2000,
-  //           isClosable: true,
-  //         });
-  //         navigate("/");
-  //         if (remember) {
-  //           setCookie("currentUser", data.currentUser._id, { path: "/" });
-  //         } else {
-  //           removeCookie("currentUser", { path: "/" });
-  //         }
-  //       } else {
-  //         toast({
-  //           title: "Error!",
-  //           description: "Google authentication failed.",
-  //           status: "error",
-  //           duration: 2000,
-  //           isClosable: true,
-  //         });
-  //       }
-  //     } catch (error) {
-  //       console.error("Google Login Error:", error);
-  //       toast({
-  //         title: "Error!",
-  //         description: "An error occurred during Google authentication.",
-  //         status: "error",
-  //         duration: 2000,
-  //         isClosable: true,
-  //       });
-  //     }
-  //   },
-  //   onError: (error) => {
-  //     console.error("Google Login Error:", error);
-  //     toast({
-  //       title: "Error!",
-  //       description: "An error occurred during Google authentication.",
-  //       status: "error",
-  //       duration: 2000,
-  //       isClosable: true,
-  //     });
-  //   },
-  // });
 
   return (
     <Box
@@ -207,22 +146,30 @@ const Login = () => {
         >
           Register
         </Button>
-        <Button
-          mt={3}
-          width="100%"
-          variant="solid"
-          colorScheme="red"
-          onClick={() => {}}
-          leftIcon={
-            <img
-              src={google}
-              alt="Google Logo"
-              style={{ width: "20px", height: "20px" }}
-            />
-          }
-        >
-          Login with Google
-        </Button>
+        <Box mt={3} display="flex" justifyContent="center">
+          <GoogleLogin
+            onSuccess={(credentialResponse) => {
+              const id_token = credentialResponse.credential;
+              fetch("http://localhost:4000/auth/google", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ token: id_token }),
+              })
+                .then((res) => res.json())
+                .then((data) => {
+                  // Handle success
+                })
+                .catch((error) => {
+                  // Handle error
+                });
+            }}
+            onError={() => {
+              console.error("Google Login Error");
+            }}
+          />
+        </Box>
       </Box>
     </Box>
   );

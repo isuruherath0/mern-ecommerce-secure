@@ -4,6 +4,8 @@ const cors = require('cors');
 const dotenv = require('dotenv').config();
 const stripe = require("stripe")(process.env.STRIPE_API_KEY);
 const helmet = require('helmet');
+const { OAuth2Client } = require('google-auth-library'); // Import Google OAuth2Client
+const User = require('./models/User'); // Import User model
 
 const categoryRoutes = require('./routes/categoryRoutes');
 const productRoutes = require('./routes/productRoutes');
@@ -18,6 +20,9 @@ const miniImageRoutes = require('./routes/miniImageRoutes');
 
 const app = express();
 const port = process.env.PORT || 4000;
+
+// Initialize Google OAuth2 Client
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // MIDDLEWARES
 
@@ -34,9 +39,8 @@ app.use(
     })
 );
 
-
 const corsOptions = {
-    origin: ['http://localhost:3000'], //accepting requests from trusted origin
+    origin: ['http://localhost:3000'], // accepting requests from trusted origin
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
@@ -58,6 +62,40 @@ app.use('/reports', reportRoutes);
 app.use('/images', imageRoutes);
 app.use('/minis', miniImageRoutes);
 
+// GOOGLE AUTHENTICATION ROUTE
+app.post('/auth/google', async (req, res) => {
+    const { token } = req.body;
+    console.log('Received token:', token); // Log the token received
+
+    try {
+        // Verify Google token
+        const ticket = await client.verifyIdToken({
+            idToken: token,
+            audience: process.env.GOOGLE_CLIENT_ID,
+        });
+        const payload = ticket.getPayload();
+
+        // Check if user exists
+        let user = await User.findOne({ email: payload.email });
+        if (!user) {
+            // Create new user
+            user = new User({
+                email: payload.email,
+                firstName: payload.given_name || '',
+                lastName: payload.family_name || '',
+                googleId: payload.sub, // Google's unique user ID
+                name: payload.name,
+            });
+            await user.save();
+        }
+
+        // Return user info
+        res.status(201).json({ currentUser: user });
+    } catch (error) {
+        console.error('Error verifying Google token:', error.stack);
+        res.status(401).json({ message: 'Invalid token', error: error.message });
+    }
+});
 
 // STRIPE CONNECTION
 app.post("/create-payment-intent", async (req, res) => {
@@ -83,4 +121,3 @@ mongoose.connect(process.env.MONGODB_URL, () => {
 app.listen(port, () => {
     console.log(`Server is running on port ${port}.`);
 });
-
