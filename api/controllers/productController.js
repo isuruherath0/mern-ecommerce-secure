@@ -32,13 +32,13 @@ exports.getProductById = async (req, res) => {
 
 exports.getProductsByColor = async (req, res) => {
     try {
-        const products = await Product.find({ 
+        const products = await Product.find({
             $and: [
                 { price: { $gte: req.body.lowest } },
                 { price: { $lte: req.body.uppest } },
                 { color: req.params.color }
             ]
-         });
+        });
 
         res.status(200).json({
             products
@@ -172,6 +172,13 @@ exports.addProduct = async (req, res) => {
 
 exports.updateProduct = async (req, res) => {
     try {
+        const user = req.body.user;
+        if (user.isAdmin !== true) {
+            return res.status(401).json({
+                status: 'failed',
+                error: 'You are not authorized to update a product'
+            });
+        }
         const product = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
 
         res.status(200).json({
@@ -187,6 +194,13 @@ exports.updateProduct = async (req, res) => {
 
 exports.deleteProduct = async (req, res) => {
     try {
+        const user = req.body.user;
+        if (user.isAdmin !== true) {
+            return res.status(401).json({
+                status: 'failed',
+                error: 'You are not authorized to delete a product'
+            });
+        }
         const product = await Product.findByIdAndDelete(req.params.id);
 
         res.status(200).json({
