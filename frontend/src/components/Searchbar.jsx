@@ -2,28 +2,18 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box, FormControl, Input, InputGroup, Button, InputRightElement } from '@chakra-ui/react';
 import { Search } from '@mui/icons-material';
+import { Encode } from 'owasp-java-encoder';
 
 import { useSearchContext } from '../contexts/SearchContext';
-
-// Function to sanitize HTML input
-function sanitizeHTML(input) {
-  return input.replace(/[&<>"'/]/g, match => ({
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#x27;',
-    '/': '&#x2F;',
-  }[match]));
-}
 
 const Searchbar = () => {
     const [searchText, setSearchText] = useState("");
     const { setSearch, setCanSearch } = useSearchContext();
     const navigate = useNavigate();
 
+    // Handle input sanitization with OWASP Java Encoder
     const handleInput = (e) => {
-        const sanitizedInput = sanitizeHTML(e.target.value);
+        const sanitizedInput = Encode.forHtml(e.target.value); // Encode user input for HTML
         setSearchText(sanitizedInput);
     };
 
