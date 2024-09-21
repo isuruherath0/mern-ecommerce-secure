@@ -73,14 +73,16 @@ export const addProduct = async (imageUrl, name, color, sizes, description, cate
     return data;
 };
 
-export const updateProduct = async (id, name, description, price, userId, isAdmin) => {
-    const user = { userId, isAdmin }
+export const updateProduct = async (id, name, description, price, token) => {
     try {
         const { data } = await axios.put(`${process.env.REACT_APP_API_BASE_URL}/products/${id}`, {
             name,
             description,
-            price,
-            user: user
+            price
+        }, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
         });
 
         return data;
