@@ -5,22 +5,33 @@ import { Search } from '@mui/icons-material';
 
 import { useSearchContext } from '../contexts/SearchContext';
 
+// Function to sanitize HTML input
+function sanitizeHTML(input) {
+  return input.replace(/[&<>"'/]/g, match => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#x27;',
+    '/': '&#x2F;',
+  }[match]));
+}
 
 const Searchbar = () => {
-
     const [searchText, setSearchText] = useState("");
     const { setSearch, setCanSearch } = useSearchContext();
-    const navigate=useNavigate();
+    const navigate = useNavigate();
 
     const handleInput = (e) => {
-        setSearchText(e.target.value);
+        const sanitizedInput = sanitizeHTML(e.target.value);
+        setSearchText(sanitizedInput);
     };
 
     const handleSubmit = (e) => {
+        e.preventDefault();
         setCanSearch(true);
         setSearch(searchText);
         navigate(`/search`);
-        e.preventDefault();
     };
 
     return (
@@ -41,7 +52,7 @@ const Searchbar = () => {
                 </InputGroup>
             </FormControl>
         </Box>
-    )
-}
+    );
+};
 
 export default Searchbar;
