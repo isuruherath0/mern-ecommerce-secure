@@ -172,13 +172,15 @@ exports.addProduct = async (req, res) => {
 
 exports.updateProduct = async (req, res) => {
     try {
-        const user = req.body.user;
-        if (user.isAdmin !== true) {
+        const user = req.user;
+
+        if (!user || !user.admin) {
             return res.status(401).json({
                 status: 'failed',
                 error: 'You are not authorized to update a product'
             });
         }
+
         const product = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
 
         res.status(200).json({
@@ -187,7 +189,7 @@ exports.updateProduct = async (req, res) => {
     } catch (error) {
         res.status(400).json({
             status: 'failed',
-            error
+            error: error.message
         });
     }
 };

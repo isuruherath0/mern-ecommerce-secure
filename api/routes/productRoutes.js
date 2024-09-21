@@ -14,6 +14,7 @@ const {
     deleteProduct,
     getProductsByQueries
 } = require('../controllers/productController');
+const authMiddleware = require('../middleware/authMiddleware');
 
 router.route('/').get(getAllProducts);
 router.route('/query/price').post(getProductsByPrice);
@@ -25,7 +26,7 @@ router.route('/status/:status').get(getProductsByStatus);
 router.route('/search/:search').get(getProductsBySearch);
 router.route('/query/full').post(getProductsByQueries);
 router.route('/').post(addProduct);
-router.route('/:id').put(updateProduct);
+router.route('/:id').put(authMiddleware, updateProduct);
 router.route('/:id').delete(deleteProduct);
 
 module.exports = router;

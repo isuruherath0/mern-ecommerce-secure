@@ -101,6 +101,7 @@ exports.Login = [
                     email: user.email,
                     firstName: user.firstName,
                     lastName: user.lastName,
+                    admin: user.admin
                 }
             };
 
