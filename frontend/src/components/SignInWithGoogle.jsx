@@ -25,7 +25,6 @@ function SignInWithGoogle() {
         body: JSON.stringify({
           name: resultsFromGoogle.user.displayName,
           email: resultsFromGoogle.user.email,
-          googlePhotoUrl: resultsFromGoogle.user.photoURL,
         }),
       });
 
