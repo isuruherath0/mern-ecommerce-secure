@@ -74,25 +74,29 @@ exports.Login = [
 
 exports.google = async (req, res) => {
 
-    const { email ,name } = req.body;
+    const { email, name } = req.body;
     try {
-        const user = await User.findOne({ email}).lean();
+        const user = await User.findOne({ email }).lean();
         if (!user) {
             const generatedPassword = Math.random().toString(36).slice(-8); // Generate a random password
 
             const hashedPassword = await bcrypt.hash(generatedPassword, 10);
-            const editedname  = name.toLowercase().split(' ').join('') + Math.round().toString(9).slice(-4); // Generate a unique username
+
 
             const newUser = await User.create({
-                name : editedname ,
+                firstName: name,
                 email,
-                password: hashedPassword
+                password: hashedPassword,
+                lastName: "Doe",
+                phone: "1244567890",
+                address: "123 Main St"
             });
+
+            res.status(201).json({ newUser });
         }
+
         return res.status(200).json({ currentUser: user });
-
-
-    }catch (error) {
-    res.status(500).json({ status: 'failed', error: error.message });
-    }  
+    } catch (error) {
+        res.status(500).json({ status: 'failed', error: error.message });
+    }
 }
