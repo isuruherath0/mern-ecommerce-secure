@@ -5,13 +5,13 @@ import { initializeApp } from "firebase/app";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-    apiKey: "AIzaSyD47NtgnpJwstnu_myMxhBkkh_j_7ogNUo",
-    authDomain: "mean-app-4bdb9.firebaseapp.com",
-    projectId: "mean-app-4bdb9",
-    storageBucket: "mean-app-4bdb9.appspot.com",
-    messagingSenderId: "140035734163",
-    appId: "1:140035734163:web:5be46eac4b5cbb65bdeb66"
-};
+    apiKey: "AIzaSyDtvuhYmDLY9s2lHpN7GkEmyB55VBNOF6w",
+    authDomain: "clothify-web-app.firebaseapp.com",
+    projectId: "clothify-web-app",
+    storageBucket: "clothify-web-app.appspot.com",
+    messagingSenderId: "67944257580",
+    appId: "1:67944257580:web:7f17f9f572755f6d239989"
+  };
 
 // Initialize Firebase
 export const app = initializeApp(firebaseConfig);
