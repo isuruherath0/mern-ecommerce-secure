@@ -2,8 +2,11 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv').config();
-const stripe = require("stripe")(process.env.STRIPE_API_KEY);
+const stripe = require('stripe')(process.env.STRIPE_API_KEY);
 const helmet = require('helmet');
+const https = require('https');
+const fs = require('fs');
+const http = require('http');
 
 const categoryRoutes = require('./routes/categoryRoutes');
 const productRoutes = require('./routes/productRoutes');
@@ -20,8 +23,7 @@ const app = express();
 const port = process.env.PORT || 4000;
 
 // MIDDLEWARES
-
-app.use(helmet());  // Adding Helmet for security headers
+app.use(helmet()); // Adding Helmet for security headers
 app.use(
     helmet.contentSecurityPolicy({
         directives: {
@@ -33,7 +35,6 @@ app.use(
         },
     })
 );
-
 
 const corsOptions = {
     origin: ['http://localhost:3000'], //accepting requests from trusted origin
@@ -58,7 +59,6 @@ app.use('/reports', reportRoutes);
 app.use('/images', imageRoutes);
 app.use('/minis', miniImageRoutes);
 
-
 // STRIPE CONNECTION
 app.post("/create-payment-intent", async (req, res) => {
     const { price } = req.body;
@@ -76,6 +76,13 @@ app.post("/create-payment-intent", async (req, res) => {
     });
 });
 
+// SSL configuration
+const sslOptions = {
+    key: fs.readFileSync('ssl/privkey.pem'),
+    cert: fs.readFileSync('ssl/cert.pem'),
+};
+
+// MongoDB connection
 mongoose.connect(process.env.MONGODB_URL, () => {
     console.log('Successfully connected to database.');
 });
@@ -84,3 +91,17 @@ app.listen(port, () => {
     console.log(`Server is running on port ${port}.`);
 });
 
+
+// Start HTTPS server
+https.createServer(sslOptions, app).listen(443, () => {
+    console.log('HTTPS Server is running on port 443');
+});
+
+
+// HTTP server to redirect to HTTPS
+http.createServer((req, res) => {
+    res.writeHead(301, { "Location": `https://${req.headers.host}${req.url}` });
+    res.end();
+}).listen(80, () => {
+    // console.log(`HTTP Server running on port 80, redirecting to HTTPS`);
+});
