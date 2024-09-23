@@ -134,7 +134,3 @@ dist
 # Package lock file
 package-lock.json
 
-
-#ssl keys
-api/ssl/privkey.pem
-api/ssl/cert.pem
