@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { body, param } = require('express-validator');
 const { getAllUsers, getUserById, updateUser, deleteUser, addFavorite, deleteFavorite } = require('../controllers/userController');
-const { Login, Register } = require('../controllers/authController');
+const { Login, Register , google } = require('../controllers/authController');
 
 // Sanitize and validate input for sensitive routes
 router.route('/')
@@ -27,6 +27,9 @@ router.route('/register')
 
 router.route('/login')
     .post(Login);
+
+router.route('/google')
+    .post(google);
 
 router.route('/:id/favorite/:favorite')
     .post(

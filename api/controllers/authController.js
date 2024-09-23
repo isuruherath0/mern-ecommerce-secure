@@ -71,3 +71,28 @@ exports.Login = [
         }
     }
 ];
+
+exports.google = async (req, res) => {
+
+    const { email ,name } = req.body;
+    try {
+        const user = await User.findOne({ email}).lean();
+        if (!user) {
+            const generatedPassword = Math.random().toString(36).slice(-8); // Generate a random password
+
+            const hashedPassword = await bcrypt.hash(generatedPassword, 10);
+            const editedname  = name.toLowercase().split(' ').join('') + Math.round().toString(9).slice(-4); // Generate a unique username
+
+            const newUser = await User.create({
+                name : editedname ,
+                email,
+                password: hashedPassword
+            });
+        }
+        return res.status(200).json({ currentUser: user });
+
+
+    }catch (error) {
+    res.status(500).json({ status: 'failed', error: error.message });
+    }  
+}
