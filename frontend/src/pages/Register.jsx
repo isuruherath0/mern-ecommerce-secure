@@ -210,18 +210,20 @@ const Register = () => {
         >
           Register
         </Button>
-        <br />
-        <Text my={3} width="100%" textAlign="center">
-          or
-        </Text>
+
         <Button
           width="100%"
           variant="outline"
           colorScheme="facebook"
           onClick={() => navigate("/login")}
+          mt={2}
         >
           Login
         </Button>
+        <br />
+        <Text my={3} width="100%" textAlign="center">
+          or
+        </Text>
         <SignInWithGoogle />
       </Box>
     </Box>

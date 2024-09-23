@@ -1,36 +1,30 @@
 import React from "react";
 import { FcGoogle } from "react-icons/fc";
-import { Button, useToast } from "@chakra-ui/react";
+import { Button, useToast, Text } from "@chakra-ui/react";
 import { GoogleAuthProvider, getAuth, signInWithPopup } from "firebase/auth";
 import { app } from "../firebase";
 import { useNavigate } from "react-router-dom";
 import { useUserContext } from "../contexts/UserContext";
+import { GoogleLogin } from "../services/AuthServices";
 
 function SignInWithGoogle() {
   const auth = getAuth(app);
   const navigate = useNavigate();
   const { setCurrentUser } = useUserContext();
   const toast = useToast();
+
   const handleGoogleClick = async () => {
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt: "select_account" });
     try {
       const resultsFromGoogle = await signInWithPopup(auth, provider);
 
-      const res = await fetch("http://localhost:4000/users/google", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: resultsFromGoogle.user.displayName,
-          email: resultsFromGoogle.user.email,
-        }),
-      });
+      const { displayName: name, email } = resultsFromGoogle.user;
 
-      const data = await res.json();
+      const res = await GoogleLogin(name, email);
+      const data = res.data;
 
-      if (res.ok) {
+      if (res.status === 200) {
         console.log("Sign In With Google Success");
         setCurrentUser(data.currentUser._id);
         toast({
@@ -46,18 +40,19 @@ function SignInWithGoogle() {
       console.error(error);
     }
   };
-
   return (
     <div className="">
       <Button
         width="100%"
         variant="solid"
-        colorScheme="teal"
+        colorScheme="blackAlpha"
         onClick={handleGoogleClick}
         mt={2}
       >
         <FcGoogle />
-        Sign in with Google
+        <Text ml={2} textAlign="center">
+          Sign in with Google
+        </Text>
       </Button>
     </div>
   );

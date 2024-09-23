@@ -134,19 +134,21 @@ const Login = () => {
         >
           Login
         </Button>
-        <SignInWithGoogle />
-        <br />
-        <Text my={3} width="100%" textAlign="center">
-          or
-        </Text>
+
         <Button
           width="100%"
           variant="outline"
           colorScheme="facebook"
           onClick={() => navigate("/register")}
+          mt={2}
         >
           Register
         </Button>
+
+        <Text my={3} width="100%" textAlign="center">
+          or
+        </Text>
+        <SignInWithGoogle />
       </Box>
     </Box>
   );
