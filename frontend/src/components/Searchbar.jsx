@@ -11,9 +11,9 @@ const Searchbar = () => {
     const { setSearch, setCanSearch } = useSearchContext();
     const navigate = useNavigate();
 
-    // Handle input sanitization with OWASP Java Encoder
+    // Handle input sanitization with DOMPurify
     const handleInput = (e) => {
-        const sanitizedInput = Encode.forHtml(e.target.value); // Encode user input for HTML
+        const sanitizedInput = DOMPurify.sanitize(e.target.value); 
         setSearchText(sanitizedInput);
     };
 
