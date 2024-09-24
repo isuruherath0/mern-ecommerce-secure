@@ -9,7 +9,7 @@ export const SearchProvider = ({ children }) => {
     const values = {
         search,
         setSearch,
-        canSearch,
+        canSearch,  
         setCanSearch
     };
 
